@@ -1,8 +1,48 @@
-/*
+/* Styles specific to the chat modal */
+.chat-modal-content {   /* Adjust this for the desired width */
+    height: 60vh;   /* Adjust this for the desired height */
+    display: flex;
+    flex-direction: column;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.chat-messages {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    margin: 10px 0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;  /* Spacing between messages */
+}
 
-If your plugin does not need CSS, delete this file.
+.chat-input {
+    display: flex;
+    gap: 10px;  /* Spacing between input and button */
+}
 
-*/
+.chat-input input {
+    flex: 1 1 auto;
+    padding: 10px;
+}
+
+.chat-input button {
+    flex: 0 0 auto;
+    padding: 10px 20px;
+}
+
+.message {
+    max-width: 80%; /* Ensure messages don't span the entire width for readability */
+    padding: 5px 10px;
+    word-wrap: break-word;
+    border-radius: 5px;
+}
+
+.user-message {
+    align-self: flex-end;
+    background-color: var(--background-secondary);
+}
+
+.bot-message {
+    align-self: flex-start;
+    background-color: var(--background-secondary);;
+}
