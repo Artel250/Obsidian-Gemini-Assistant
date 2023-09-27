@@ -1,16 +1,27 @@
 import BardPlugin from "main";
-import { App, Modal, Plugin } from "obsidian";
+import { App, Modal, Notice, MarkdownRenderer } from "obsidian";
 import { send } from "process";
+import { Bard } from "./BardConnection";
+import { type } from "os";
 
 export class ChatModal extends Modal {
     #plugin: BardPlugin;
     #chatMessages: HTMLElement;
     #userInput: HTMLInputElement;
+    #Bard: Bard;
 
 
     constructor(app: App, plugin: BardPlugin) {
         super(app);
         this.#plugin = plugin;
+        Bard.getBard(plugin.settings.Bard_Token).then((result) => {
+            if (result) {
+                this.#Bard = result;
+            }
+            else {
+                new Notice("Something went wrong when trying to create a Bard connection");
+            }
+        });
     }
 
     onOpen() {
@@ -33,7 +44,7 @@ export class ChatModal extends Modal {
         this.#userInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 this.sendMessage();
-        
+
                 // Prevents default behavior (newline) when pressing Enter
                 event.preventDefault();
             }
@@ -43,17 +54,30 @@ export class ChatModal extends Modal {
     sendMessage() {
         let userMessage = this.#userInput.value;
 
-        if(userMessage == null || userMessage == "") return;
+        if (userMessage == null || userMessage == "") return;
 
-        // Append user message
-        this.#chatMessages.createEl('div', { text: userMessage, cls: 'message user-message' });
+        this.#chatMessages.createEl('div', { text: userMessage, cls: 'message user-message' }).scrollIntoView({ behavior: "smooth" });;
 
-        // Clear input
+
         this.#userInput.value = '';
 
-        // TODO: Connect to Bart AI for actual response, using a placeholder for now
-        let botResponse = "Hello, I'm Bart!";
-        this.#chatMessages.createEl('div', { text: botResponse, cls: 'message bot-message' });
+        const botResponseDiv = this.#chatMessages.createEl('div', { cls: 'message bot-message' });
+        botResponseDiv.append(this.typingAnimation());
+
+        this.#Bard.getResponse(userMessage).then((response) => {
+            botResponseDiv.querySelector(".typing-indicator")?.remove();
+            MarkdownRenderer.render(this.app, response, botResponseDiv, "", this.#plugin);
+            botResponseDiv.scrollIntoView({ behavior: "smooth" });
+        });
+    }
+
+    typingAnimation() {
+        const typingAnim = createDiv({cls:"typing-indicator"})
+        typingAnim.appendChild(createSpan())
+        typingAnim.appendChild(createSpan())
+        typingAnim.appendChild(createSpan())
+
+        return typingAnim;
     }
 
     onClose() {

@@ -1,5 +1,7 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { ChatModal } from "components/ChatModal";
+import { Bard } from 'components/BardConnection';
+
 
 
 // Remember to rename these classes and interfaces!
@@ -19,7 +21,7 @@ export default class BardPlugin extends Plugin {
 		await this.loadSettings();
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		this.addSettingTab(new SettingsTab(this.app, this));
 
 		this.addCommand({
 			id: "Open-Chat-Modal-Command",
@@ -28,7 +30,6 @@ export default class BardPlugin extends Plugin {
 				new ChatModal(this.app, this).open();
 			}
 		})
-
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
@@ -45,24 +46,7 @@ export default class BardPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 }
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const { contentEl } = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
+class SettingsTab extends PluginSettingTab {
 	plugin: BardPlugin;
 
 	constructor(app: App, plugin: BardPlugin) {
@@ -76,10 +60,10 @@ class SampleSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
+			.setName('__Secure-1PSID')
+			.setDesc('Enter your __Secure-1PSID token here')
 			.addText(text => text
-				.setPlaceholder('Enter your secret')
+				.setPlaceholder('Your token here')
 				.setValue(this.plugin.settings.Bard_Token)
 				.onChange(async (value) => {
 					this.plugin.settings.Bard_Token = value;
