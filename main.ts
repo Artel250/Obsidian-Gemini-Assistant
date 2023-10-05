@@ -2,10 +2,6 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 import { ChatModal } from "components/ChatModal";
 import { Bard } from 'components/BardConnection';
 
-
-
-// Remember to rename these classes and interfaces!
-
 interface TalkToBardSettings {
 	Bard_Token: string;
 }
@@ -24,13 +20,12 @@ export default class BardPlugin extends Plugin {
 		this.addSettingTab(new SettingsTab(this.app, this));
 
 		this.addCommand({
-			id: "Open-Chat-Modal-Command",
+			id: "open-chat",
 			name: "Chat with Bard",
 			callback: () => {
 				new ChatModal(this.app, this).open();
 			}
 		})
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
