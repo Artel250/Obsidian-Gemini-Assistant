@@ -25,11 +25,6 @@ export default class BardPlugin extends Plugin {
 				new ChatModal(this.app, this).open();
 			}
 		})
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
-	}
-
-	onunload() {
-
 	}
 
 	async loadSettings() {
