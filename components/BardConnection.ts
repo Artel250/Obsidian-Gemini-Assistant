@@ -11,6 +11,8 @@ export class Bard {
     #conversationID: string;
     #responseID: string;
     #choiceId: string;
+    #fSid: string;
+    #bl: string;
 
     constructor(bard_token: string) {
         this.#bard_token = bard_token;
@@ -29,7 +31,7 @@ export class Bard {
         ]
         const params = {
             "_reqid": this.#reqid,
-            "bl": 'boq_assistant-bard-web-server_20230912.07_p1',
+            "bl": this.#bl,
             "rt": "c"
         }
         const data = {
@@ -61,7 +63,7 @@ export class Bard {
         return jsons[4][0][1][0]
     }
 
-    async getSnim0e() {
+    async getAuthentication() {
         console.log(this.#bard_token);
         if (this.#bard_token == null || this.#bard_token.charAt(this.#bard_token.length - 1) != ".") {
             throw new Error("__Secure-Ps1d token is either missing or incomplete");
@@ -73,20 +75,35 @@ export class Bard {
             }
         })
 
-        const regex = /"SNlM0e":"(.*?)"/;
-        const match = resp.match(regex)?.[1];
+        // get the at token
+        var regex = /"SNlM0e":"(.*?)"/;
+        const sn1m0e = resp.match(regex)?.[1];
 
-        if (match == null) {
+        // get the fsid token
+        regex = /"FdrFJe":"(.*?)"/;
+        const fsid = resp.match(regex)?.[1];
+
+        // get the bl value
+        regex = /"cfb2h":"(.*?)"/;
+        const bl = resp.match(regex)?.[1];
+
+        if (sn1m0e == null) {
             throw new Error("Unable to get the snim0e token");
+        } else if (fsid == null) {
+            throw new Error("Unable to get the f.sid token");
+        } else if (bl == null) {
+            throw new Error("Unable to get the bl token");
         } else {
-            this.#snim0e = match;
+            this.#snim0e = sn1m0e;
+            this.#fSid = fsid;
+            this.#bl = bl;
         }
     }
 
     static async getBard(bard_token: string) {
         let bard = new Bard(bard_token);
         try {
-            await bard.getSnim0e();
+            await bard.getAuthentication();
             return bard;
         } catch (error) {
             console.error(error);
