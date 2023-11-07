@@ -12,6 +12,8 @@ Here is how you get it:
 4. Navigate to Application > Cookies
 5. Find the \_\_Secure-1PSID cookie and paste its value in the settings of this plugin.
 
+**Note**: Sometimes, the **__Secure-1PSID** token will not be enough. In this case you will need to add the **__Secure-1PSIDCC** and **__Secure-1PSIDTS** cookies too. (You can find them in the same place you found the first cookie)
+
 ## How to use
 1. Select the "Chat with Bard" command in the command palette.
 2. Start Chatting 
