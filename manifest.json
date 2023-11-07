@@ -1,7 +1,7 @@
 {
 	"id": "chat-with-bard",
 	"name": "Chat with Bard",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"minAppVersion": "0.15.0",
 	"description": "Chat with the Google Bard Assistant directly from Obsidian",
 	"author": "Artel250",
