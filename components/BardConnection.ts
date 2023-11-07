@@ -75,7 +75,6 @@ export class Bard {
     }
 
     async getAuthentication() {
-        console.log(this.#bard_token);
         if (this.#bard_token == null || this.#bard_token.charAt(this.#bard_token.length - 1) != ".") {
             throw new Error("__Secure-Ps1d token is either missing or incomplete");
         }
