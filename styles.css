@@ -1,8 +1,11 @@
 /* Styles specific to the chat modal */
-.chat-modal-content {   /* Adjust this for the desired width */
-    height: 60vh;   /* Adjust this for the desired height */
+.chat-modal-content {
+    /* Adjust this for the desired width */
+    height: 60vh;
+    /* Adjust this for the desired height */
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .chat-messages {
@@ -12,12 +15,14 @@
     padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 10px;  /* Spacing between messages */
+    gap: 10px;
+    /* Spacing between messages */
 }
 
 .chat-input {
     display: flex;
-    gap: 10px;  /* Spacing between input and button */
+    gap: 10px;
+    /* Spacing between input and button */
 }
 
 .chat-input input {
@@ -31,7 +36,8 @@
 }
 
 .message {
-    max-width: 80%; /* Ensure messages don't span the entire width for readability */
+    max-width: 80%;
+    /* Ensure messages don't span the entire width for readability */
     padding: 5px 10px;
     word-wrap: break-word;
     border-radius: 5px;
@@ -44,8 +50,10 @@
 
 .bot-message {
     align-self: flex-start;
-    background-color: var(--background-secondary);;
+    background-color: var(--background-secondary);
+    ;
 }
+
 .typing-indicator {
     display: flex;
     align-items: center;
@@ -57,7 +65,8 @@
     width: 8px;
     height: 8px;
     margin: 0 2px;
-    background-color: var(--color-purple); /* Change this to your desired color */
+    background-color: var(--color-purple);
+    /* Change this to your desired color */
     border-radius: 50%;
     opacity: 0.4;
     animation: pulsate 1.4s infinite;
@@ -72,10 +81,75 @@
 }
 
 @keyframes pulsate {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 0.4;
     }
+
     50% {
         opacity: 1;
     }
+}
+
+.hidden {
+    display: none;
+}
+
+.conversation-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    padding: 5px 15px;
+    background-color: var(--background-primary-alt);
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    font-size: 1rem;
+    white-space: nowrap;
+}
+
+.conversation-button:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.conversation-list-item {
+    position: relative;
+    display: block;
+    padding: 8px 12px;
+    margin: 2px 0;
+    background-color: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    color: var(--text-normal);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.conversation-list-item:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.conversation-list-item.active {
+    background-color: var(--background-modifier-active-hover);
+    border-color: #90c2ff;
+}
+
+.conversation-list-item {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-button {
+    display: none;
+}
+
+.conversation-list-item:hover .delete-button {
+    display: flex;
+    position: absolute;
+    right: 10px;
+    z-index: 5px;
 }

@@ -29,6 +29,15 @@ export default class BardPlugin extends Plugin {
 				new ChatModal(this.app, this).open();
 			}
 		})
+		this.addCommand({
+			id: "debug",
+			name: "Testtttt",
+			callback: () => {
+				Bard.getBard(this.settings.Bard_Token, this.settings.Bard_Token_2, this.settings.Bard_Token_3).then((result) => {
+					result?.getConversation("c_7815b5d52918ecff").then(result => console.log(result));
+				})
+			}
+		})
 	}
 
 	async loadSettings() {

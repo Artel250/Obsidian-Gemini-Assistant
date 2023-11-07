@@ -4,6 +4,7 @@ import { join } from "path";
 import * as querystring from "querystring";
 import { json } from "stream/consumers";
 
+
 export class Bard {
     #bard_token: string;
     #bard_token_2: string; //__Secure-1PSIDCC
@@ -26,6 +27,65 @@ export class Bard {
         this.#choiceId = "";
     }
 
+    async deleteConversation(conversationID: string) {
+        const input_text_struct = [
+            [["GzXR5e", `["${conversationID}", 10]`, null, "generic"]]
+        ];
+        const data = {
+            "f.req": JSON.stringify(input_text_struct),
+            "at": this.#snim0e
+        }
+
+        await this.makeRequest("post", "https://bard.google.com/_/BardChatUi/data/batchexecute?", "GzXR5e", data, "/chat");
+    }
+
+    async getConversation(conversationID: string) {
+        const input_text_struct = [
+            [["hNvQHb", `["${conversationID}", 10]`, null, "generic"]]
+        ];
+
+        const data = {
+            "f.req": JSON.stringify(input_text_struct),
+            "at": this.#snim0e,
+        };
+
+        let jsons = await this.makeRequest("post", "https://bard.google.com/_/BardChatUi/data/batchexecute?", "hNvQHb", data, "/chat/" + conversationID)
+        var result = new Array();
+
+
+        jsons[0].forEach((element: any[][]) => {
+            let userMessage = element[2][0][0];
+            let botResponse = "Bot response"
+            let responseId = "";
+            let choiceId = ""
+
+            for (let index = 0; index < element[3][0].length; index++) {
+                if (element[3][0][index][0] == element[3][3]) {
+                    botResponse = element[3][0][index][1][0]
+                    choiceId = element[3][3];
+                }
+            }
+            responseId = element[0][1];
+            result.unshift({ "UserMessage": userMessage, "BotResponse": botResponse, "responseID": responseId, "choiceId": choiceId });
+        });
+        return result;
+    }
+
+    async getConversations() {
+        const input_text_struct = [
+            [["MaZiqc", "[13,null,[0]]", null, "generic"]]
+        ];
+
+        const data = {
+            "f.req": JSON.stringify(input_text_struct),
+            "at": this.#snim0e
+        }
+
+        let jsons = await this.makeRequest("post", "https://bard.google.com/_/BardChatUi/data/batchexecute?", "MaZiqc", data, "/chat");
+
+        return jsons[0];
+    }
+
     async getResponse(query: string): Promise<string> {
         const input_text_struct = [
             [query, 0, null, [], null, null, 0],
@@ -33,37 +93,53 @@ export class Bard {
             [this.#conversationID, this.#responseID, this.#choiceId] /*, null, null, []],
             null, null, null, [1], 0, [], [], 1, 0,*/
         ]
-        const params = {
-            "_reqid": this.#reqid,
-            "bl": this.#bl,
-            "rt": "c"
-        }
+
         const data = {
             "f.req": JSON.stringify([null, JSON.stringify(input_text_struct)]),
             "at": this.#snim0e,
         }
 
+        let jsons = await this.makeRequest("post", "https://bard.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate?", "", data, "");
+
+
+        this.#conversationID = jsons[1][0]
+        this.#responseID = jsons[1][1]
+        this.#choiceId = jsons[4][0][0]
+
+        console.log(this.#conversationID + " / " + this.#responseID + " / " + this.#choiceId)
+
+
+        return jsons[4][0][1][0]
+    }
+
+    async makeRequest(method: string, url: string, rpcids: string, data: any, path: string) {
+        let params = {
+            "_reqid": this.#reqid,
+            "bl": this.#bl,
+            "f.sid": this.#fSid,
+            "source-path": path,
+            "rt": "c",
+            "rpcids": rpcids
+        }
         const requestParams: RequestUrlParam = {
-            url: "https://bard.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate?" + querystring.stringify(params),
-            method: "post",
+            url: url + querystring.stringify(params),
+            method: method,
             throw: true,
-            body: querystring.stringify(data),
+            body: new URLSearchParams(data).toString(),
             contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
             headers: {
                 "Cookie": this.getCookies()
             }
         }
-        
+
+
+
         let resp = await request(requestParams);
-        let lines = resp.split('\n').filter(line => line.startsWith('[["wrb.fr'));
-        let jsons = lines.map(line => JSON.parse(JSON.parse(line)[0][2]))[0];
 
         this.#reqid += 100000;
-        this.#conversationID = jsons[1][0]
-        this.#responseID = jsons[1][1]
-        this.#choiceId = jsons[4][0][0]
 
-        return jsons[4][0][1][0]
+        let lines = resp.split('\n').filter(line => line.startsWith('[["wrb.fr'));
+        return lines.map(line => JSON.parse(JSON.parse(line)[0][2]))[0];
     }
 
     getCookies() {
@@ -121,5 +197,15 @@ export class Bard {
             console.error(error);
             new Notice(error);
         }
+    }
+
+    setConversationId(conversationID: string) {
+        this.#conversationID = conversationID;
+    }
+    setResponseId(responseID: string) {
+        this.#responseID = responseID;
+    }
+    setChoiceId(choiceID: string) {
+        this.#choiceId = choiceID;
     }
 }
