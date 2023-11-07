@@ -54,13 +54,10 @@ export class Bard {
             }
         }
         
-        let resp = await request(requestParams)
-        console.log(resp);
+        let resp = await request(requestParams);
         let lines = resp.split('\n').filter(line => line.startsWith('[["wrb.fr'));
         let jsons = lines.map(line => JSON.parse(JSON.parse(line)[0][2]))[0];
 
-
-        console.log(jsons);
         this.#reqid += 100000;
         this.#conversationID = jsons[1][0]
         this.#responseID = jsons[1][1]
