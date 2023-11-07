@@ -6,6 +6,8 @@ import { json } from "stream/consumers";
 
 export class Bard {
     #bard_token: string;
+    #bard_token_2: string; //__Secure-1PSIDCC
+    #bard_tokne_3: string; //__Secure-1PSIDTS
     #reqid: number;
     #snim0e: string;
     #conversationID: string;
@@ -14,15 +16,17 @@ export class Bard {
     #fSid: string;
     #bl: string;
 
-    constructor(bard_token: string) {
+    constructor(bard_token: string, bard_token_2: string, bard_token_3: string) {
         this.#bard_token = bard_token;
+        this.#bard_token_2 = bard_token_2;
+        this.#bard_tokne_3 = bard_token_3;
         this.#reqid = Math.round(Math.random() * 9999);
         this.#conversationID = "";
         this.#responseID = "";
         this.#choiceId = "";
     }
 
-    async getResponse(query: string) : Promise<string> {
+    async getResponse(query: string): Promise<string> {
         const input_text_struct = [
             [query, 0, null, [], null, null, 0],
             null,
@@ -46,15 +50,17 @@ export class Bard {
             body: querystring.stringify(data),
             contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
             headers: {
-                "Cookie": `__Secure-1PSID=${this.#bard_token}`
+                "Cookie": this.getCookies()
             }
         }
-
+        
         let resp = await request(requestParams)
+        console.log(resp);
         let lines = resp.split('\n').filter(line => line.startsWith('[["wrb.fr'));
         let jsons = lines.map(line => JSON.parse(JSON.parse(line)[0][2]))[0];
 
 
+        console.log(jsons);
         this.#reqid += 100000;
         this.#conversationID = jsons[1][0]
         this.#responseID = jsons[1][1]
@@ -63,17 +69,27 @@ export class Bard {
         return jsons[4][0][1][0]
     }
 
+    getCookies() {
+        let cookies = `__Secure-1PSID=${this.#bard_token}`
+        if (this.#bard_token_2 != undefined && this.#bard_token_2 != "") { cookies += `;__Secure-1PSIDCC=${this.#bard_token_2}` }
+        if (this.#bard_tokne_3 != undefined && this.#bard_tokne_3 != "") { cookies += `;__Secure-1PSIDTS=${this.#bard_tokne_3}` }
+
+        return cookies;
+    }
+
     async getAuthentication() {
         console.log(this.#bard_token);
         if (this.#bard_token == null || this.#bard_token.charAt(this.#bard_token.length - 1) != ".") {
             throw new Error("__Secure-Ps1d token is either missing or incomplete");
         }
         let resp = await request({
+            method: "get",
             url: "https://bard.google.com/",
             headers: {
-                "Cookie": `__Secure-1PSID=${this.#bard_token}`
+                "Cookie": this.getCookies()
             }
         })
+
 
         // get the at token
         var regex = /"SNlM0e":"(.*?)"/;
@@ -100,8 +116,8 @@ export class Bard {
         }
     }
 
-    static async getBard(bard_token: string) {
-        let bard = new Bard(bard_token);
+    static async getBard(bard_token: string, bard_token_2: string, bard_token_3: string) {
+        let bard = new Bard(bard_token, bard_token_2, bard_token_3);
         try {
             await bard.getAuthentication();
             return bard;

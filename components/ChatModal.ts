@@ -14,7 +14,7 @@ export class ChatModal extends Modal {
     constructor(app: App, plugin: BardPlugin) {
         super(app);
         this.#plugin = plugin;
-        Bard.getBard(plugin.settings.Bard_Token).then((result) => {
+        Bard.getBard(plugin.settings.Bard_Token, plugin.settings.Bard_Token_2, plugin.settings.Bard_Token_3).then((result) => {
             if (result) {
                 this.#Bard = result;
             }

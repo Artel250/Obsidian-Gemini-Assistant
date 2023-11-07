@@ -4,10 +4,14 @@ import { Bard } from 'components/BardConnection';
 
 interface TalkToBardSettings {
 	Bard_Token: string;
+	Bard_Token_2: string;
+	Bard_Token_3: string;
 }
 
 const DEFAULT_SETTINGS: TalkToBardSettings = {
-	Bard_Token: 'default'
+	Bard_Token: '',
+	Bard_Token_2: "",
+	Bard_Token_3: ""
 }
 
 export default class BardPlugin extends Plugin {
@@ -58,5 +62,25 @@ class SettingsTab extends PluginSettingTab {
 					this.plugin.settings.Bard_Token = value;
 					await this.plugin.saveSettings();
 				}));
+
+		let optionalTokensHeader = containerEl.createEl("p", { text: "Enter these cookie values if the __Secure-1PSID token does not work" });
+		new Setting(optionalTokensHeader)
+			.setName("__Secure-1PSIDCC")
+			.addText(text => text
+				.setPlaceholder("Your token here")
+				.setValue(this.plugin.settings.Bard_Token_2)
+				.onChange(async (value) => {
+					this.plugin.settings.Bard_Token_2 = value;
+					await this.plugin.saveSettings();
+				}))
+		new Setting(optionalTokensHeader)
+			.setName("__Secure-1PSIDTS")
+			.addText(text => text
+				.setPlaceholder("Your token here")
+				.setValue(this.plugin.settings.Bard_Token_3)
+				.onChange(async (value) => {
+					this.plugin.settings.Bard_Token_3 = value;
+					await this.plugin.saveSettings();
+				}))
 	}
 }
