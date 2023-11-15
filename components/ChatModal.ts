@@ -5,6 +5,7 @@ import { Bard } from "./BardConnection";
 import { type } from "os";
 import { DebugBard } from "./DebugBard";
 import { Console } from "console";
+import { createHash } from "crypto";
 
 export class ChatModal extends Modal {
     #plugin: BardPlugin;
@@ -78,31 +79,52 @@ export class ChatModal extends Modal {
     }
 
     showConversations() {
-        this.#Chat.classList.add("slide-in")
-        //this.#Chat.style.display = "none";
-        this.#Conversations.style.transform = 'translateX(0)';
-        this.#Conversations.toggleClass("hidden", false);
+        this.#Chat.classList.add("fadeout")
+        this.#Conversations.classList.add("fadein")
+
         this.#Chat.style.pointerEvents = 'none';
         this.#Conversations.style.pointerEvents = "none"
 
-        // disable the chat when animation is complete
-        this.#Chat.addEventListener('transitionend', () => {
-            this.#Chat.style.display = "none"
+        this.#Chat.toggleClass("hidden", false);
+        this.#Conversations.toggleClass("hidden", false);
+
+        this.#Conversations.style.overflowY = "auto";
+
+        this.#Chat.addEventListener('animationend', () => {
             this.#Conversations.style.pointerEvents = "auto";
-            console.log("transition to conversations done!");
+            this.#Chat.style.pointerEvents = "none"
+
+            this.#Conversations.removeClass("fadein");
+            this.#Chat.removeClass("fadeout");
+
+            this.#Conversations.toggleClass("hidden", false);
+            this.#Chat.toggleClass("hidden", true);
+
         }, { once: true });
     }
 
     showChat() {
-        this.#Chat.classList.remove("slide-in");
-        this.#Chat.style.display = "flex";
+        this.#Chat.addClass("fadein");
+        this.#Conversations.addClass("fadeout");
+
         this.#Chat.style.pointerEvents = "none";
         this.#Conversations.style.pointerEvents = "none"
-        this.#Conversations.style.transform = 'translateX(100%)';
-        this.#Conversations.style.overflow = "hidden";
-        this.#Conversations.addEventListener('transitionend', () => {
-            this.#Conversations.toggleClass("hidden", true)
+
+        this.#Chat.toggleClass("hidden", false);
+        this.#Conversations.toggleClass("hidden", false);
+
+        // disable vertical scroll to prevent jittering when changin
+        this.#Conversations.style.overflowY = "hidden";
+
+        this.#Conversations.addEventListener('animationend', () => {
             this.#Chat.style.pointerEvents = "auto";
+            this.#Conversations.style.pointerEvents = "none";
+
+            this.#Conversations.removeClass("fadeout");
+            this.#Chat.removeClass("fadein");
+
+            this.#Conversations.toggleClass("hidden", true);
+            this.#Chat.toggleClass("hidden", false);
         }, { once: true });
 
     }
@@ -111,6 +133,9 @@ export class ChatModal extends Modal {
         while (this.#chatMessages.lastChild) {
             this.#chatMessages.lastChild.remove();
         }
+        this.#Bard.setConversationId(null);
+        this.#Bard.setResponseId(null);
+        this.#Bard.setChoiceId(null);
     }
 
     switchToConversation(conversationId: string) {
@@ -123,7 +148,6 @@ export class ChatModal extends Modal {
             })
             this.#Bard.setResponseId(result[result.length - 1]["responseID"])
             this.#Bard.setChoiceId(result[result.length - 1]["choiceId"])
-            console.log("=> " + conversationId + " / " + result[result.length - 1]["responseID"] + " / " + result[result.length - 1]["choiceId"]);
         });
     }
 
@@ -137,10 +161,19 @@ export class ChatModal extends Modal {
             this.#Conversations.lastChild.remove();
         }
 
-        //this.#Conversations.toggleClass('hidden', false);
-        //this.#Chat.toggleClass("hidden", true);
-
         this.#Bard.getConversations().then((result) => {
+            //add the new chat button
+            const newChatButton = this.#Conversations.createEl("div", {
+                cls: "newChatButton",
+                text: "New Chat"
+            })
+            newChatButton.onClickEvent((event) => {
+                event.stopPropagation();
+                this.showChat();
+                this.clearChat();
+            })
+
+            //add all the conversations
             result.forEach((conversation: string[]) => {
                 const listItem = this.#Conversations.createEl('div', {
                     cls: 'conversation-list-item'
@@ -174,8 +207,6 @@ export class ChatModal extends Modal {
                     if (listItem.dataset.conversationId != undefined) {
                         this.switchToConversation(listItem.dataset.conversationId);
                         this.showChat();
-                        // this.#Conversations.toggleClass('hidden', true); // Hide list after selection
-                        //this.#Chat.toggleClass("hidden", false);
                     }
                 })
             });

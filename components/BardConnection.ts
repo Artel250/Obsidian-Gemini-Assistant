@@ -11,9 +11,9 @@ export class Bard {
     #bard_tokne_3: string; //__Secure-1PSIDTS
     #reqid: number;
     #snim0e: string;
-    #conversationID: string;
-    #responseID: string;
-    #choiceId: string;
+    #conversationID: string | null;
+    #responseID: string | null;
+    #choiceId: string | null;
     #fSid: string;
     #bl: string;
 
@@ -69,7 +69,6 @@ export class Bard {
             result.unshift({ "UserMessage": userMessage, "BotResponse": botResponse, "responseID": responseId, "choiceId": choiceId });
         });
 
-        console.log(JSON.stringify(result));
         return result;
     }
 
@@ -108,9 +107,6 @@ export class Bard {
         this.#responseID = jsons[1][1]
         this.#choiceId = jsons[4][0][0]
 
-        console.log(this.#conversationID + " / " + this.#responseID + " / " + this.#choiceId)
-
-
         return jsons[4][0][1][0]
     }
 
@@ -141,7 +137,6 @@ export class Bard {
         this.#reqid += 100000;
 
         let lines = resp.split('\n').filter(line => line.startsWith('[["wrb.fr'));
-        console.log(lines.map(line => JSON.parse(JSON.parse(line)[0][2]))[0]);
         return lines.map(line => JSON.parse(JSON.parse(line)[0][2]))[0];
     }
 
@@ -202,13 +197,13 @@ export class Bard {
         }
     }
 
-    setConversationId(conversationID: string) {
+    setConversationId(conversationID: string | null) {
         this.#conversationID = conversationID;
     }
-    setResponseId(responseID: string) {
+    setResponseId(responseID: string | null) {
         this.#responseID = responseID;
     }
-    setChoiceId(choiceID: string) {
+    setChoiceId(choiceID: string | null) {
         this.#choiceId = choiceID;
     }
 }
