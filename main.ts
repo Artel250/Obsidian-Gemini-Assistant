@@ -6,12 +6,14 @@ interface TalkToBardSettings {
 	Bard_Token: string;
 	Bard_Token_2: string;
 	Bard_Token_3: string;
+	DeveloperMode: boolean;
 }
 
 const DEFAULT_SETTINGS: TalkToBardSettings = {
 	Bard_Token: '',
 	Bard_Token_2: "",
-	Bard_Token_3: ""
+	Bard_Token_3: "",
+	DeveloperMode: false
 }
 
 export default class BardPlugin extends Plugin {
@@ -89,6 +91,15 @@ class SettingsTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.Bard_Token_3)
 				.onChange(async (value) => {
 					this.plugin.settings.Bard_Token_3 = value;
+					await this.plugin.saveSettings();
+				}))
+		new Setting(containerEl)
+			.setName("Developer mode")
+			.setDesc("Fakes the sending of requests to avoid error 429")
+			.addToggle(value => value
+				.setValue(this.plugin.settings.DeveloperMode)
+				.onChange(async (value) => {
+					this.plugin.settings.DeveloperMode = value;
 					await this.plugin.saveSettings();
 				}))
 	}

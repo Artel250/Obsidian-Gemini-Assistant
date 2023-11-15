@@ -1,3 +1,5 @@
+import { Console } from "console";
+import { Bard } from "./BardConnection";
 import { url } from "inspector";
 import { Notice, RequestUrlParam, request, requestUrl } from "obsidian";
 import { join } from "path";
@@ -5,7 +7,7 @@ import * as querystring from "querystring";
 import { json } from "stream/consumers";
 
 
-export class Bard {
+export class DebugBard extends Bard {
     #bard_token: string;
     #bard_token_2: string; //__Secure-1PSIDCC
     #bard_tokne_3: string; //__Secure-1PSIDTS
@@ -18,6 +20,7 @@ export class Bard {
     #bl: string;
 
     constructor(bard_token: string, bard_token_2: string, bard_token_3: string) {
+        super(bard_token, bard_token_2, bard_token_3);
         this.#bard_token = bard_token;
         this.#bard_token_2 = bard_token_2;
         this.#bard_tokne_3 = bard_token_3;
@@ -28,90 +31,51 @@ export class Bard {
     }
 
     async deleteConversation(conversationID: string) {
-        const input_text_struct = [
-            [["GzXR5e", `["${conversationID}", 10]`, null, "generic"]]
-        ];
-        const data = {
-            "f.req": JSON.stringify(input_text_struct),
-            "at": this.#snim0e
-        }
-
-        await this.makeRequest("post", "https://bard.google.com/_/BardChatUi/data/batchexecute?", "GzXR5e", data, "/chat");
+        console.log("DEBUG BARD: Deleting conversation " + conversationID)
     }
 
     async getConversation(conversationID: string) {
-        const input_text_struct = [
-            [["hNvQHb", `["${conversationID}", 10]`, null, "generic"]]
-        ];
 
-        const data = {
-            "f.req": JSON.stringify(input_text_struct),
-            "at": this.#snim0e,
-        };
+        let result = [{
+            "UserMessage": "Please remember the code word lavender",
+            "BotResponse": "I will remember the code word \"lavender.\"",
+            "responseID": "r_7fd58f4c34784641",
+            "choiceId": "rc_1de3369c0219bdf3"
+        },
+        {
+            "UserMessage": "what is the code word?",
+            "BotResponse": "The code word is \"lavender.\"",
+            "responseID": "r_4f9d38a217087817",
+            "choiceId": "rc_361bc099016b4525"
+        }]
 
-        let jsons = await this.makeRequest("post", "https://bard.google.com/_/BardChatUi/data/batchexecute?", "hNvQHb", data, "/chat/" + conversationID)
-        var result = new Array();
-
-
-        jsons[0].forEach((element: any[][]) => {
-            let userMessage = element[2][0][0];
-            let botResponse = "Bot response"
-            let responseId = "";
-            let choiceId = ""
-
-            for (let index = 0; index < element[3][0].length; index++) {
-                if (element[3][0][index][0] == element[3][3]) {
-                    botResponse = element[3][0][index][1][0]
-                    choiceId = element[3][3];
-                }
-            }
-            responseId = element[0][1];
-            result.unshift({ "UserMessage": userMessage, "BotResponse": botResponse, "responseID": responseId, "choiceId": choiceId });
-        });
-
-        console.log(JSON.stringify(result));
         return result;
     }
 
     async getConversations() {
-        const input_text_struct = [
-            [["MaZiqc", "[13,null,[0]]", null, "generic"]]
-        ];
-
-        const data = {
-            "f.req": JSON.stringify(input_text_struct),
-            "at": this.#snim0e
-        }
-
-        let jsons = await this.makeRequest("post", "https://bard.google.com/_/BardChatUi/data/batchexecute?", "MaZiqc", data, "/chat");
+        let jsons = [[
+            ['c_e079d823ac905a97', 'Forterro | abas: ERP Software for Mid-Sized Manufacturing', false, false, '', [1699453998, 750035000]],
+            ['c_9fe162a28ea02c64', 'Remembering code word "lavender"', false, false, '', [1699356005, 15547000]],
+            ['c_43a86bec0da1ee00', 'Code word table request', false, false, '', [1699355935, 93132000]],
+            ['c_83efa0bb126b621c', 'Remember code word', false, false, '', [1699355894, 787354000]],
+            ['c_e466dfc9cf1ffe23', 'Remembering code words', false, false, '', [1699355562, 86529000]],
+            ['c_7bd5c81834a618e5', 'Introducing the code word "char"', false, false, '', [1699355388, 906106000]],
+            ['c_c4be49b893dff725', 'Assistant Is Working', false, false, '', [1699354436, 878028000]],
+            ['c_0bb40a99b570e07d', 'Remember code word', false, false, '', [1699354419, 578969000]],
+            ['c_7815b5d52918ecff', 'Remembering the word "rose"', false, false, '', [1699354295, 549268000]],
+            ['c_dee3dbc77a070d31', 'Assistant ready to assist', false, false, '', [1699351414, 504864000]],
+            ['c_29a9a2d67fef675e', 'Remembering the code word "tulip"', false, false, '', [1699346862, 940578000]],
+            ['c_466fd4891b989e4e', 'Greeting', false, false, '', [1699306111, 95254000]]
+        ], 'tCqkBAblK0n83Blerc2Z2zIPwT+RH5VXXEUJ8c5Is+5l+Bw0/m…dErKkyliAliaco7s7VgO7nDARfvmGg943JyQfHzycfKWVJQ==']
 
         return jsons[0];
     }
 
     async getResponse(query: string): Promise<string> {
-        const input_text_struct = [
-            [query, 0, null, [], null, null, 0],
-            null,
-            [this.#conversationID, this.#responseID, this.#choiceId] /*, null, null, []],
-            null, null, null, [1], 0, [], [], 1, 0,*/
-        ]
 
-        const data = {
-            "f.req": JSON.stringify([null, JSON.stringify(input_text_struct)]),
-            "at": this.#snim0e,
-        }
+        console.log("DEBUG BARD: Responding to \"" + query + "\"");
 
-        let jsons = await this.makeRequest("post", "https://bard.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate?", "", data, "");
-
-
-        this.#conversationID = jsons[1][0]
-        this.#responseID = jsons[1][1]
-        this.#choiceId = jsons[4][0][0]
-
-        console.log(this.#conversationID + " / " + this.#responseID + " / " + this.#choiceId)
-
-
-        return jsons[4][0][1][0]
+        return "DEBUG RESPONSE";
     }
 
     async makeRequest(method: string, url: string, rpcids: string, data: any, path: string) {
@@ -192,14 +156,8 @@ export class Bard {
     }
 
     static async getBard(bard_token: string, bard_token_2: string, bard_token_3: string) {
-        let bard = new Bard(bard_token, bard_token_2, bard_token_3);
-        try {
-            await bard.getAuthentication();
-            return bard;
-        } catch (error) {
-            console.error(error);
-            new Notice(error);
-        }
+        let bard = new DebugBard(bard_token, bard_token_2, bard_token_3);
+        return bard;
     }
 
     setConversationId(conversationID: string) {
