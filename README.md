@@ -23,7 +23,7 @@ Here is how you get it:
 ## Development Plan
   
   - [x] Add basic chat modal
-  - [ ] Add the ability to access previous chats 
+  - [x] Add the ability to access previous chats 
   - [ ] Bard in the side panel and in a separate window
   - [ ] Give Bard access to the notes
   - [ ] Let Bard type in the notes
