@@ -31,7 +31,7 @@ export default class BardPlugin extends Plugin {
 				new ChatModal(this.app, this).open();
 			}
 		})
-		this.addCommand({
+		/*this.addCommand({
 			id: "debug",
 			name: "Testtttt",
 			callback: () => {
@@ -39,7 +39,7 @@ export default class BardPlugin extends Plugin {
 					result?.getConversation("c_7815b5d52918ecff").then(result => console.log(result));
 				})
 			}
-		})
+		})*/
 	}
 
 	async loadSettings() {
@@ -93,7 +93,7 @@ class SettingsTab extends PluginSettingTab {
 					this.plugin.settings.Bard_Token_3 = value;
 					await this.plugin.saveSettings();
 				}))
-		new Setting(containerEl)
+		/*new Setting(containerEl)
 			.setName("Developer mode")
 			.setDesc("Fakes the sending of requests to avoid error 429")
 			.addToggle(value => value
@@ -101,6 +101,6 @@ class SettingsTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.DeveloperMode = value;
 					await this.plugin.saveSettings();
-				}))
+				}))*/
 	}
 }
