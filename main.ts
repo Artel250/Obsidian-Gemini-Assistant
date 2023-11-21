@@ -1,6 +1,7 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { ChatModal } from "components/ChatModal";
 import { Bard } from 'components/BardConnection';
+import { InsertTextModal } from 'components/InsertTextModal';
 
 interface TalkToBardSettings {
 	Bard_Token: string;
@@ -31,15 +32,21 @@ export default class BardPlugin extends Plugin {
 				new ChatModal(this.app, this).open();
 			}
 		})
-		/*this.addCommand({
+		this.addCommand({
+			id: "bard-insert",
+			name: "Bard Insert",
+			editorCallback: (editor: Editor) => {
+				new InsertTextModal(this.app, this, editor).open();
+			}
+		})
+
+		this.addCommand({
 			id: "debug",
 			name: "Testtttt",
-			callback: () => {
-				Bard.getBard(this.settings.Bard_Token, this.settings.Bard_Token_2, this.settings.Bard_Token_3).then((result) => {
-					result?.getConversation("c_7815b5d52918ecff").then(result => console.log(result));
-				})
+			editorCallback: (editor: Editor) => {
+				console.log(editor.getSelection());
 			}
-		})*/
+		})
 	}
 
 	async loadSettings() {
@@ -93,7 +100,7 @@ class SettingsTab extends PluginSettingTab {
 					this.plugin.settings.Bard_Token_3 = value;
 					await this.plugin.saveSettings();
 				}))
-		/*new Setting(containerEl)
+		new Setting(containerEl)
 			.setName("Developer mode")
 			.setDesc("Fakes the sending of requests to avoid error 429")
 			.addToggle(value => value
@@ -101,6 +108,6 @@ class SettingsTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.DeveloperMode = value;
 					await this.plugin.saveSettings();
-				}))*/
+				}));
 	}
 }

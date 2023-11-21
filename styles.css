@@ -219,7 +219,7 @@
 
 .newChatButton {
     position: sticky;
-    top:0;
+    top: 0;
     z-index: 3;
     display: block;
     padding: 8px 12px;
@@ -237,4 +237,28 @@
 .newChatButton:hover {
     background-color: var(--background-secondary-alt);
     transition: 0.3s;
+}
+
+.insertTextModalContent {
+    height: 20vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.insertTextModalInput {
+    flex: 1;
+    margin-bottom: 10px;
+    resize: none;
+    box-shadow: none !important;
+}
+
+.insertTextModalResponse {
+    display: flex;
+    flex-direction: column-reverse;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
 }
