@@ -1,29 +1,46 @@
-# Chat with Bard
-
-This plugin enables you to chat with [Google Bard](https://bard.google.com/) directly from obsidian completely for free.
+# Gemini AI Assistant
+This plugin enables you to chat with Google's [Gemini AI](https://gemini.google.com/app) directly from obsidian completely for free.
 
 Please note that this is my first obsidian plugin and mistakes are bound to happen. Feel free to report anything you find on the GitHub.
-## Setup
-In order to be able to use this plugin, you need your own **\_\_Secure-1PSID** token from Bard.
-Here is how you get it:
-1. Go to: https://bard.google.com/
-2. Sign in to your google account
-3. Open the Developer tools with `Ctr + Shift + i` (`Option + ⌘ + i` on Mac)
-4. Navigate to Application > Cookies
-5. Find the \_\_Secure-1PSID cookie and paste its value in the settings of this plugin.
 
-**Note**: Sometimes, the **__Secure-1PSID** token will not be enough. In this case you will need to add the **__Secure-1PSIDCC** and **__Secure-1PSIDTS** cookies too. (You can find them in the same place you found the first cookie)
+## Setup
+In order to be able to use this plugin, you need your Google Gemini API key.
+Here is how you get it:
+1. Go to https://ai.google.dev/gemini-api
+2. Press "Get API key in Google AI Studio" and log in with your Google account.
+3. Press "Get API Key" and the key should appear in the table below.
+4. Copy the Key and paste it into this plugins settings.
+
+> [!warning] Information for EU residents
+> If you are trying to get your API Key from the EU, Google will require you to set up a billing account with a credit card. You will get a free tier of 300€ for three months and you will not be automatically charged after the trial, unless you manually enable it. [Learn more](https://ai.google.dev/gemini-api/docs/billing#is-Gemini-free-in-EEA-UK-CH)
 
 ## How to use
-1. Select the "Chat with Bard" command in the command palette.
-2. Start Chatting 
+After you have set up your API key, you can use the command "New Gemini Chat" to create a new chat. Alternatively, the plugin will add a ribbon on the right side that also creates a new chat.
 
-**Note**: Each time you open the Chat window, it starts a new chat. You can see all of your previous chats at https://bard.google.com/
+**Chats are saved locally**
+Because google does not store your chat history through their API, your chats are stored locally with the gemini extensions. This means that your chats are files in your vault - just open the file like any other obsidian note and continue where you left off.
 
-## Development Plan
-  
-  - [x] Add basic chat modal
-  - [x] Add the ability to access previous chats 
-  - [ ] Bard in the side panel and in a separate window
-  - [ ] Give Bard access to the notes
-  - [ ] Let Bard type in the notes
+**Default folder for new chats**
+By default all of your new chats are created into the "Gemini Chats" folder so that they won't clutter your vault. You can change the default folder in the plugin settings.
+
+**Gemini in the sidebar**
+If you want to chat in the sidebar, simply create a new chat and drag and drop it into the sidebar.
+
+**Copy paste**
+Gemini uses markdown for its responses. You can just use the clipboard icon at the top of each message to copy it and you can paste it directly into any obsidian note and it will keep all of the formatting.
+
+## Information about Billing
+You can see all of the information about Gemini free and paid tiers [here](https://ai.google.dev/pricing). This plugin is using Gemini 1.5 Flash, which falls into the free tier category.
+However, if you set up a billing account, enable payments and manage to exceed the free usage limits, you **will be charged**. 
+
+You can find more information about Gemini Billing [here](https://ai.google.dev/gemini-api/docs/billing)
+
+**Development plan**
+- [x] General chat capabilities
+- [ ] Ability to change model
+- [ ] Usage visualizer
+- [ ] Prompt templates
+- [ ] Generate entire notes with Google Gemini
+- [ ] *(**MAYBE**: feature to generate a vault with Gemini (needs more research))*
+
+Thank you for using my plugin. Please feel free to reach out to me on [Github](https://github.com/Artel250/Obsidian-Talk-with-Bard) regarding *ANY* thoughts about the plugin.
