@@ -1,9 +1,9 @@
 {
 	"id": "chat-with-bard",
-	"name": "Chat with Bard",
+	"name": "Gemini AI Assistant",
 	"version": "0.2.0",
 	"minAppVersion": "0.15.0",
-	"description": "Chat with the Google Bard Assistant directly from Obsidian",
+	"description": "Use Google Gemini directly in obsidian for free.",
 	"author": "Artel250",
 	"authorUrl": "https://github.com/Artel250",
 	"isDesktopOnly": true

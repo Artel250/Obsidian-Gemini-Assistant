@@ -262,3 +262,184 @@
     justify-content: center;
     align-items: center;
 }
+
+/*.modal-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%; 
+    overflow: hidden; 
+}
+*/
+
+.parent-element {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* This should be the height of the container in which the chat is placed */
+}
+
+.messages-container {
+    /* Container for chat messages */
+    flex-grow: 1;
+    /* Takes up all available space */
+    overflow-y: auto;
+    /* Only this part is scrollable */
+    flex-direction: column-reverse;
+    display: flex;
+    padding: 20px;
+}
+
+.gemini-chat-display {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
+    padding-bottom: 10px;
+    /* Space at the bottom inside the chat display */
+    height: 100%;
+}
+
+.input-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.gemini-chat-input {
+    flex-grow: 1;
+    margin-right: 5px;
+    /* Spacing between input and button */
+}
+
+.send-button {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+/* The rest remains unchanged */
+
+
+.user-message {
+    /* Align user messages to the right */
+    background-color: var(--background-secondary-alt);
+    align-self: flex-end;
+    justify-self: flex-start;
+}
+
+.ai-message {
+    /* Align AI messages to the left */
+    background-color: var(--background-secondary-alt);
+    align-self: flex-start;
+    justify-self: flex-start;
+}
+
+.message-button-panel {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-direction: row;
+    display: flex;
+    width: auto;
+    height: auto;
+}
+
+.message-button {
+    margin: 0;
+    height: fit-content;
+    padding: 0;
+    display: flex;
+    font-size: 10px;
+    border: none;
+    background: none;
+    outline: none;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.message-button:hover {
+    background: none;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.chat-root {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-top-bar {
+    padding: 8px;
+    border-bottom: solid;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.chat-title-text {
+    font-size: xx-large;
+    width: 100%;
+    height: fit-content;
+    overflow: hidden;
+    background: none;
+    border: none;
+    outline: none;
+    border: none;
+    resize: none;
+}
+.chat-title-text:focus{
+    box-shadow: none;
+}
+
+.chat-message {
+    margin: 5px;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 70%;
+    word-wrap: break-word;
+    align-items: end;
+}
+
+.typing-indicator {
+    align-self: flex-start;
+    display: flex;
+    justify-content: center;
+    margin: 5px;
+}
+
+.typing-indicator span {
+    margin: 0 2px;
+    animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+.newChatBase{
+    flex-direction: column;
+    display: flex;
+    flex-wrap: nowrap;
+    height: 100%;
+    justify-content: flex-start;
+}
+.newChatButton{
+    margin: 5%;
+    border: 0;
+}
+.newChatHeader{
+    font-size: xx-large;
+    text-align: center;
+    margin: 10%;
+}

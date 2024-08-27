@@ -1,66 +1,123 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { ChatModal } from "components/ChatModal";
-import { Bard } from 'components/BardConnection';
-import { InsertTextModal } from 'components/InsertTextModal';
+import { App, Editor, FileView, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, View, ViewState, WorkspaceLeaf, addIcon, loadMermaid } from 'obsidian';
+import { OpenChatModal } from 'src/Modals/OpenChatModal';
+import { GeminiChatView, VIEW_TYPE_GEMINI_CHAT } from 'src/Views/GeminiChatView';
 
-interface TalkToBardSettings {
-	Bard_Token: string;
-	Bard_Token_2: string;
-	Bard_Token_3: string;
+interface GeminiPluginSettings {
+	Gemini_Api_Key: string;
 	DeveloperMode: boolean;
+	DefaultSavePath: string;
 }
 
-const DEFAULT_SETTINGS: TalkToBardSettings = {
-	Bard_Token: '',
-	Bard_Token_2: "",
-	Bard_Token_3: "",
-	DeveloperMode: false
+const DEFAULT_SETTINGS: GeminiPluginSettings = {
+	Gemini_Api_Key: "",
+	DeveloperMode: false,
+	DefaultSavePath: "Gemini Chats"
 }
 
-export default class BardPlugin extends Plugin {
-	settings: TalkToBardSettings;
+export default class GeminiPlugin extends Plugin {
+	settings: GeminiPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
-
 		this.addSettingTab(new SettingsTab(this.app, this));
 
-		this.addCommand({
-			id: "open-chat",
-			name: "Chat with Bard",
-			callback: () => {
-				new ChatModal(this.app, this).open();
+		this.registerView(
+			VIEW_TYPE_GEMINI_CHAT,
+			(leaf) => {
+				return new GeminiChatView(leaf, this.app, this);
 			}
+		);
+		this.registerExtensions(["gemini"], VIEW_TYPE_GEMINI_CHAT);
+		this.registerEvent(this.app.workspace.on("file-open", (file) => {
+			if (file?.extension == "gemini") {
+				this.activateChatView(file);
+			}
+		}))
+		this.addRibbonIcon("sparkles", "New Gemini Chat", () => { this.newChatView() });
+		this.addCommand({
+			id: 'gemini-new-chat',
+			name: 'New Gemini Chat',
+			callback: () => { this.newChatView() },
 		})
 		this.addCommand({
-			id: "bard-insert",
-			name: "Bard Insert",
-			editorCallback: (editor: Editor) => {
-				new InsertTextModal(this.app, this, editor).open();
+			id: 'gemini-open-chat',
+			name: 'Open Gemini Chat',
+			callback: () => {
+				new OpenChatModal(this.app, (file: TFile) => {
+					this.app.workspace.getLeaf(false).openFile(file);
+				}).open()
 			}
 		})
 
-		this.addCommand({
-			id: "debug",
-			name: "Testtttt",
-			editorCallback: (editor: Editor) => {
-				console.log(editor.getSelection());
-			}
-		})
+	}
+
+	async onunload() {
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_GEMINI_CHAT);
 	}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
 
+
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
-}
-class SettingsTab extends PluginSettingTab {
-	plugin: BardPlugin;
 
-	constructor(app: App, plugin: BardPlugin) {
+	async activateChatView(file: TFile) {
+		const { workspace } = this.app;
+
+		let leaf: WorkspaceLeaf | null = null;
+		const leaves = workspace.getLeavesOfType(VIEW_TYPE_GEMINI_CHAT).filter((leaf) => {
+			if (leaf.view instanceof FileView) {
+				const view = leaf.view as FileView;
+
+				if (view.file == file) {
+					return true;
+				}
+			}
+			return false;
+		});
+
+		if (leaves.length > 0) {
+			leaf = leaves[0];
+		} else {
+			leaf = workspace.getLeaf(false);
+			await leaf.setViewState({ type: VIEW_TYPE_GEMINI_CHAT, active: true });
+		}
+
+		if (leaf) {
+			workspace.setActiveLeaf(leaf);
+		}
+	}
+
+	async newChatView() {
+		let path = `${this.settings.DefaultSavePath}/`;
+		if(this.settings.DefaultSavePath == "") path = "";
+
+		let name = "New Chat.gemini"
+
+		let index = 0;
+		while (this.app.vault.getAbstractFileByPath(path + name) != null) {
+			index += 1;
+			name = `New Chat ${index}.gemini`;
+
+			if(index >= 100){
+				// Exit condition to avoid infinite loop
+				new Notice("Failed to create a new chat");
+				return;
+			}
+		}
+
+		let file = await this.app.vault.create(path + name, "");
+		await this.app.workspace.getLeaf(false).openFile(file);
+	}
+}
+
+class SettingsTab extends PluginSettingTab {
+	plugin: GeminiPlugin;
+
+	constructor(app: App, plugin: GeminiPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -71,43 +128,37 @@ class SettingsTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('__Secure-1PSID')
-			.setDesc('Enter your __Secure-1PSID token here')
+			.setName("Gemini API Key")
 			.addText(text => text
-				.setPlaceholder('Your token here')
-				.setValue(this.plugin.settings.Bard_Token)
+				.setPlaceholder("Your API key here")
+				.setValue(this.plugin.settings.Gemini_Api_Key)
 				.onChange(async (value) => {
-					this.plugin.settings.Bard_Token = value;
+					this.plugin.settings.Gemini_Api_Key = value;
 					await this.plugin.saveSettings();
-				}));
+				}))
 
-		let optionalTokensHeader = containerEl.createEl("p", { text: "Enter these cookie values if the __Secure-1PSID token does not work" });
-		new Setting(optionalTokensHeader)
-			.setName("__Secure-1PSIDCC")
-			.addText(text => text
-				.setPlaceholder("Your token here")
-				.setValue(this.plugin.settings.Bard_Token_2)
-				.onChange(async (value) => {
-					this.plugin.settings.Bard_Token_2 = value;
-					await this.plugin.saveSettings();
-				}))
-		new Setting(optionalTokensHeader)
-			.setName("__Secure-1PSIDTS")
-			.addText(text => text
-				.setPlaceholder("Your token here")
-				.setValue(this.plugin.settings.Bard_Token_3)
-				.onChange(async (value) => {
-					this.plugin.settings.Bard_Token_3 = value;
-					await this.plugin.saveSettings();
-				}))
 		new Setting(containerEl)
 			.setName("Developer mode")
-			.setDesc("Fakes the sending of requests to avoid error 429")
+			.setDesc("Fakes the sending of requests, leave this off unless you want fake answers for some reason...")
 			.addToggle(value => value
 				.setValue(this.plugin.settings.DeveloperMode)
 				.onChange(async (value) => {
 					this.plugin.settings.DeveloperMode = value;
 					await this.plugin.saveSettings();
-				}));
+				}))
+
+		new Setting(containerEl)
+			.setName("Default File Path")
+			.setDesc("The default folder for saved Gemini Chats. Leave empty to have new chats appear at vault root.")
+			.addText(text => text
+				.setPlaceholder("Folder path")
+				.setValue(this.plugin.settings.DefaultSavePath)
+				.onChange(async (value) => {
+					this.plugin.settings.DefaultSavePath = value;
+					await this.plugin.saveSettings();
+				})
+
+			)
+
 	}
 }
