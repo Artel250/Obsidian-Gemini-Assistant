@@ -1,5 +1,5 @@
 import GeminiPlugin from 'main';
-import { TextFileView, WorkspaceLeaf, TFile, App, FileView, ItemView, MarkdownView, loadMermaid } from 'obsidian';
+import { WorkspaceLeaf, TFile, App, FileView, IconName } from 'obsidian';
 import { ChatComponent } from '../Components/ChatComponent';
 import { GeminiChat } from '../GeminiChat';
 import { error } from 'console';
@@ -97,7 +97,7 @@ export class GeminiChatView extends FileView {
 
             this.titleElement.focus()
             this.titleElement.select()
-        }else{
+        } else {
             this.chatComponent.focusInput();
         }
     }
@@ -108,5 +108,9 @@ export class GeminiChatView extends FileView {
 
     canAcceptExtension(extension: string): boolean {
         return extension == "gemini";
+    }
+
+    getIcon(): IconName {
+        return "sparkles"
     }
 }
