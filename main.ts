@@ -94,21 +94,33 @@ export default class GeminiPlugin extends Plugin {
 	async newChatView() {
 		let path = `${this.settings.DefaultSavePath}/`;
 		if(this.settings.DefaultSavePath == "") path = "";
-
-		let name = "New Chat.gemini"
-
+	
+		// Check if the path exists, if not, create the directory
+		const folders = path.split('/');
+		let currentPath = "";
+		for (let folder of folders) {
+			if (folder !== "") {
+				currentPath += folder + "/";
+				if (!this.app.vault.getAbstractFileByPath(currentPath)) {
+					await this.app.vault.createFolder(currentPath);
+				}
+			}
+		}
+	
+		let name = "New Chat.gemini";
+	
 		let index = 0;
 		while (this.app.vault.getAbstractFileByPath(path + name) != null) {
 			index += 1;
 			name = `New Chat ${index}.gemini`;
-
+	
 			if(index >= 100){
 				// Exit condition to avoid infinite loop
 				new Notice("Failed to create a new chat");
 				return;
 			}
 		}
-
+	
 		let file = await this.app.vault.create(path + name, "");
 		await this.app.workspace.getLeaf(false).openFile(file);
 	}
