@@ -93,13 +93,14 @@ export default class GeminiPlugin extends Plugin {
 
 	async newChatView() {
 		let path = `${this.settings.DefaultSavePath}`;
+		if (!path.endsWith("/")) path += "/";
 		if (this.settings.DefaultSavePath == "") path = "";
 
-		this.app.vault.adapter.mkdir(path);
+		this.app.vault.adapter.mkdir(path.endsWith('/') ? path.slice(0, -1) : path);
 		let name = "New Chat.gemini";
 
 		let index = 0;
-		while (this.app.vault.getAbstractFileByPath(path + "/" + name) != null) {
+		while (this.app.vault.getAbstractFileByPath(path + name) != null) {
 			index += 1;
 			name = `New Chat ${index}.gemini`;
 
@@ -110,7 +111,8 @@ export default class GeminiPlugin extends Plugin {
 			}
 		}
 
-		let file = await this.app.vault.create(path + "/" + name, "");
+		console.log(`new chat: ${path + name}`)
+		let file = await this.app.vault.create(path + name, "");
 		await this.app.workspace.getLeaf(false).openFile(file);
 	}
 }
